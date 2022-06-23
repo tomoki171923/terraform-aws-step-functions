@@ -1,0 +1,46 @@
+name: Bump version
+on:
+  # push:
+  #   branches:
+  #     - main
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Minor Version's Release
+      - name: Bump version and push tag (Minor Version)
+        if: github.event.pull_request.merged == true && github.head_ref == 'dev'
+        id: tag_version_minor
+        uses: tomoki171923/forked-github-tag-action@v5.6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: 'minor'
+      - name: Create a GitHub release (Minor Version)
+        if: github.event.pull_request.merged == true && github.head_ref == 'dev'
+        uses: tomoki171923/forked-release-action@v1
+        with:
+          tag: ${{ steps.tag_version_minor.outputs.new_tag }}
+          name: Release ${{ steps.tag_version_minor.outputs.new_tag }}
+          body: ${{ steps.tag_version_minor.outputs.changelog }}
+
+      # Patch Version's Release
+      - name: Bump version and push tag (Patch Version)
+        if: github.event.pull_request.merged == true && github.head_ref == 'hotfix'
+        id: tag_version_patch
+        uses: tomoki171923/forked-github-tag-action@v5.6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: 'patch'
+      - name: Create a GitHub release (Patch Version)
+        if: github.event.pull_request.merged == true && github.head_ref == 'hotfix'
+        uses: tomoki171923/forked-release-action@v1
+        with:
+          tag: ${{ steps.tag_version_patch.outputs.new_tag }}
+          name: Release ${{ steps.tag_version_patch.outputs.new_tag }}
+          body: ${{ steps.tag_version_patch.outputs.changelog }}
