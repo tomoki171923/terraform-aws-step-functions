@@ -20,9 +20,9 @@ resource "aws_cloudwatch_event_target" "this" {
     }
   }
   rule     = aws_cloudwatch_event_rule.this[each.value.name].name
-  arn      = var.state_machine_arn
+  arn      = module.iam_role_event.iam_role_arn
   role_arn = var.state_machine_arn
-  input    = var.input
+  input    = each.value.input
 }
 module "iam_role_event" {
   # remote module
