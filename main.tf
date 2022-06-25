@@ -10,7 +10,7 @@
 */
 resource "aws_sfn_state_machine" "this" {
   name     = var.state_machine_name
-  role_arn = aws_iam_role.iam_for_sfn.arn
+  role_arn = module.iam_role_step_function.iam_role_arn
   type     = var.state_machine_type
 
   definition = var.state_machine_definition
@@ -87,8 +87,8 @@ module "iam_role_step_function" {
   role_requires_mfa = false
 
   custom_role_policy_arns = concat([
-    aws_iam_policy_document.sns.arn,
-  aws_iam_policy_document.logs.arn], var.state_machine_additional_policies)
+    aws_iam_policy.sns.arn,
+  aws_iam_policy.logs.arn], var.state_machine_additional_policies)
   tags = var.tags
 }
 
@@ -159,7 +159,7 @@ resource "aws_cloudwatch_metric_alarm" "succeeded" {
  Event Bridge
 */
 module "events" {
-  count              = event_params == null ? 0 : 1
+  count              = var.event_params == null ? 0 : 1
   source             = "./events/"
   event_params       = var.event_params
   state_machine_name = aws_sfn_state_machine.this.name
