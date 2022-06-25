@@ -32,6 +32,7 @@ resource "aws_cloudwatch_log_group" "this" {
   }
 }
 
+
 /*
  IAM Role For State Machine
 */
@@ -80,7 +81,7 @@ resource "aws_iam_policy" "sns" {
     Terraform = true
   }
 }
-module "iam_role" {
+module "iam_role_step_function" {
   # remote module
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.1.0"
@@ -167,4 +168,18 @@ resource "aws_cloudwatch_metric_alarm" "succeeded" {
   tags = {
     Terraform = true
   }
+}
+
+
+/*
+ Event Bridge
+*/
+module "events" {
+  count              = event_params == null ? 0 : 1
+  source             = "./events/"
+  event_params       = var.event_params
+  state_machine_name = aws_sfn_state_machine.this.name
+  state_machine_arn  = aws_sfn_state_machine.this.arn
+  aws_account_id     = data.aws_caller_identity.this.account_id
+  aws_region         = data.aws_region.this.name
 }

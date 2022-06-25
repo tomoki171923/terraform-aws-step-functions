@@ -41,3 +41,15 @@ variable "succeeded_sns_topic_arn" {
   type        = string
   default     = null
 }
+variable "event_params" {
+  description = "event bridge parameters. name: event name, description: event description, input: input data to event, schedule_expression: schedule expression(cron format)."
+  type = list(
+    object({
+      name                = string
+      description         = string
+      input               = string
+      schedule_expression = string
+    })
+  )
+  default = null
+}

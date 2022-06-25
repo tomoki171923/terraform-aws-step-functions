@@ -8,7 +8,7 @@ output "aws_iam_policy" {
   }
 }
 output "aws_iam_role" {
-  value = module.iam_role
+  value = module.iam_role_step_function
 }
 output "aws_cloudwatch_metric_alarm" {
   value = {
@@ -16,4 +16,7 @@ output "aws_cloudwatch_metric_alarm" {
     failed    = aws_cloudwatch_metric_alarm.failed
     succeeded = aws_cloudwatch_metric_alarm.succeeded
   }
+}
+output "events" {
+  value = module.events
 }
