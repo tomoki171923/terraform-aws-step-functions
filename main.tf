@@ -1,6 +1,9 @@
 # ********************************* #
-# ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sfn_state_machine
+# ref:
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sfn_state_machine
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm
 # ********************************* #
+
 
 /*
  State Machine
@@ -8,13 +11,26 @@
 resource "aws_sfn_state_machine" "this" {
   name     = var.state_machine_name
   role_arn = aws_iam_role.iam_for_sfn.arn
+  type     = var.state_machine_type
 
   definition = var.state_machine_definition
+  logging_configuration {
+    log_destination        = "${aws_cloudwatch_log_group.this.arn}:*"
+    include_execution_data = true
+    level                  = var.state_machine_log_level
+  }
   tags = {
     Terraform = true
   }
 }
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "/aws/vendedlogs/states/${var.state_machine_name}"
+  retention_in_days = var.state_machine_log_retention_in_days
 
+  tags = {
+    Terraform = true
+  }
+}
 
 /*
  IAM Role For State Machine
@@ -85,6 +101,7 @@ module "iam_role" {
   }
 }
 
+
 /*
  CloudWatch Memetric Alarm
 */
@@ -121,6 +138,27 @@ resource "aws_cloudwatch_metric_alarm" "failed" {
   }
   evaluation_periods = 1
   metric_name        = "ExecutionsFailed"
+  namespace          = "AWS/States"
+  period             = 60
+  statistic          = "Average"
+  threshold          = 0
+  treat_missing_data = "missing"
+  tags = {
+    Terraform = true
+  }
+}
+resource "aws_cloudwatch_metric_alarm" "succeeded" {
+  count               = var.succeeded_sns_topic_arn == null ? 0 : 1
+  alarm_name          = "step_functions_${var.state_machine_name}_succeeded"
+  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Succeeded. "
+  alarm_actions       = [var.succeeded_sns_topic_arn]
+  comparison_operator = "GreaterThanThreshold"
+  datapoints_to_alarm = 1
+  dimensions = {
+    StateMachineArn = aws_sfn_state_machine.this.name
+  }
+  evaluation_periods = 1
+  metric_name        = "ExecutionsSucceeded"
   namespace          = "AWS/States"
   period             = 60
   statistic          = "Average"

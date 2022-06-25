@@ -10,3 +10,10 @@ output "aws_iam_policy" {
 output "aws_iam_role" {
   value = module.iam_role
 }
+output "aws_cloudwatch_metric_alarm" {
+  value = {
+    timeout   = aws_cloudwatch_metric_alarm.timeout
+    failed    = aws_cloudwatch_metric_alarm.failed
+    succeeded = aws_cloudwatch_metric_alarm.succeeded
+  }
+}
