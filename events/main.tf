@@ -10,7 +10,7 @@ resource "aws_cloudwatch_event_rule" "this" {
   description         = each.value.description
   schedule_expression = each.value.schedule_expression
   is_enabled          = true
-  tags                = { Terraform = true }
+  tags                = var.tags
 }
 resource "aws_cloudwatch_event_target" "this" {
   for_each = {
@@ -38,9 +38,7 @@ module "iam_role_event" {
   role_requires_mfa = false
 
   custom_role_policy_arns = []
-  tags = {
-    Terraform = true
-  }
+  tags                    = var.tags
 }
 data "aws_iam_policy_document" "this" {
   statement {
@@ -57,7 +55,5 @@ resource "aws_iam_policy" "this" {
   name        = "InvokeStepFunctions_${var.state_machine_name}"
   description = "publish sns topic permission for ${var.state_machine_name} State Machine."
   policy      = data.aws_iam_policy_document.this.json
-  tags = {
-    Terraform = true
-  }
+  tags        = var.tags
 }
