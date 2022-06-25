@@ -19,17 +19,13 @@ resource "aws_sfn_state_machine" "this" {
     include_execution_data = true
     level                  = var.state_machine_log_level
   }
-  tags = {
-    Terraform = true
-  }
+  tags = var.tags
 }
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/vendedlogs/states/${var.state_machine_name}"
   retention_in_days = var.state_machine_log_retention_in_days
 
-  tags = {
-    Terraform = true
-  }
+  tags = var.tags
 }
 
 
@@ -58,9 +54,7 @@ resource "aws_iam_policy" "logs" {
   name        = "WriteLogs_${var.state_machine_name}"
   description = "write cloudwatch logs permission for ${var.state_machine_name} State Machine."
   policy      = data.aws_iam_policy_document.logs.json
-  tags = {
-    Terraform = true
-  }
+  tags        = var.tags
 }
 data "aws_iam_policy_document" "sns" {
   statement {
@@ -77,9 +71,7 @@ resource "aws_iam_policy" "sns" {
   name        = "PublishSNS_${var.state_machine_name}"
   description = "publish sns topic permission for ${var.state_machine_name} State Machine."
   policy      = data.aws_iam_policy_document.sns.json
-  tags = {
-    Terraform = true
-  }
+  tags        = var.tags
 }
 module "iam_role_step_function" {
   # remote module
@@ -97,9 +89,7 @@ module "iam_role_step_function" {
   custom_role_policy_arns = concat([
     aws_iam_policy_document.sns.arn,
   aws_iam_policy_document.logs.arn], var.state_machine_additional_policies)
-  tags = {
-    Terraform = true
-  }
+  tags = var.tags
 }
 
 
@@ -123,9 +113,7 @@ resource "aws_cloudwatch_metric_alarm" "timeout" {
   statistic          = "Average"
   threshold          = 0
   treat_missing_data = "missing"
-  tags = {
-    Terraform = true
-  }
+  tags               = var.tags
 }
 resource "aws_cloudwatch_metric_alarm" "failed" {
   count               = var.failed_sns_topic_arn == null ? 0 : 1
@@ -144,9 +132,7 @@ resource "aws_cloudwatch_metric_alarm" "failed" {
   statistic          = "Average"
   threshold          = 0
   treat_missing_data = "missing"
-  tags = {
-    Terraform = true
-  }
+  tags               = var.tags
 }
 resource "aws_cloudwatch_metric_alarm" "succeeded" {
   count               = var.succeeded_sns_topic_arn == null ? 0 : 1
@@ -165,9 +151,7 @@ resource "aws_cloudwatch_metric_alarm" "succeeded" {
   statistic          = "Average"
   threshold          = 0
   treat_missing_data = "missing"
-  tags = {
-    Terraform = true
-  }
+  tags               = var.tags
 }
 
 
@@ -182,4 +166,5 @@ module "events" {
   state_machine_arn  = aws_sfn_state_machine.this.arn
   aws_account_id     = data.aws_caller_identity.this.account_id
   aws_region         = data.aws_region.this.name
+  tags               = var.tags
 }
