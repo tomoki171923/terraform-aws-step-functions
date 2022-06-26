@@ -164,7 +164,7 @@ resource "aws_cloudwatch_metric_alarm" "succeeded" {
 */
 module "events" {
   count              = var.event_params == null ? 0 : 1
-  source             = "./events/"
+  source             = "./modules/events/"
   event_params       = var.event_params
   state_machine_name = aws_sfn_state_machine.this.name
   state_machine_arn  = aws_sfn_state_machine.this.arn
