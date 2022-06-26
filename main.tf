@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "logs" {
       "logs:GetLogDelivery",
       "logs:UpdateLogDelivery",
       "logs:DeleteLogDelivery",
-      "logs:ListLogDeliverys",
+      "logs:ListLogDeliveries",
       "logs:PutResourcePolicy",
       "logs:DescribeResourcePolicies",
       "logs:DescribeLogGroups"
@@ -51,8 +51,8 @@ data "aws_iam_policy_document" "logs" {
   }
 }
 resource "aws_iam_policy" "logs" {
-  name        = "WriteLogs_${var.state_machine_name}"
-  description = "write cloudwatch logs permission for ${var.state_machine_name} State Machine."
+  name        = "CloudWatchLogsDeliveryFullAccessPolicy-${var.state_machine_name}"
+  description = "cloudwatch logs full access permission for ${var.state_machine_name} State Machine."
   policy      = data.aws_iam_policy_document.logs.json
   tags        = var.tags
 }
@@ -82,11 +82,12 @@ module "iam_role_step_function" {
     "states.amazonaws.com"
   ]
   create_role       = true
-  role_name         = "StepFunctionsRole_${var.state_machine_name}"
+  role_name         = "StepFunctions-${var.state_machine_name}-role"
   role_description  = "Step Functions (${var.state_machine_name}) IAM Role."
   role_requires_mfa = false
 
   custom_role_policy_arns = concat([
+    data.aws_iam_policy.AWSLambdaRole.arn,
     aws_iam_policy.sns.arn,
   aws_iam_policy.logs.arn], var.state_machine_additional_policies)
   tags = var.tags
@@ -96,18 +97,21 @@ module "iam_role_step_function" {
 /*
  CloudWatch Memetric Alarm
 */
-resource "aws_cloudwatch_metric_alarm" "timeout" {
+locals {
+  state_machine_url = "https://${data.aws_region.this.name}.console.aws.amazon.com/states/home?region=${data.aws_region.this.name}#/statemachines/view/arn:aws:states:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:stateMachine:${var.state_machine_name}"
+}
+resource "aws_cloudwatch_metric_alarm" "timedout" {
   count               = var.timeout_sns_topic_arn == null ? 0 : 1
-  alarm_name          = "step_functions_${var.state_machine_name}_timeout"
-  alarm_description   = "StepFunctions ${var.state_machine_name} Execution TimeOut. "
+  alarm_name          = "step_functions_${var.state_machine_name}_timedout"
+  alarm_description   = "StepFunctions ${var.state_machine_name} Execution TimedOut. StateMachine: <${local.state_machine_url}>"
   alarm_actions       = [var.timeout_sns_topic_arn]
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
   dimensions = {
-    StateMachineArn = aws_sfn_state_machine.this.name
+    StateMachineArn = aws_sfn_state_machine.this.arn
   }
   evaluation_periods = 1
-  metric_name        = "ExecutionsTimeOut"
+  metric_name        = "ExecutionsTimedOut"
   namespace          = "AWS/States"
   period             = 60
   statistic          = "Average"
@@ -118,12 +122,12 @@ resource "aws_cloudwatch_metric_alarm" "timeout" {
 resource "aws_cloudwatch_metric_alarm" "failed" {
   count               = var.failed_sns_topic_arn == null ? 0 : 1
   alarm_name          = "step_functions_${var.state_machine_name}_failed"
-  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Failed. "
+  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Failed. StateMachine: <${local.state_machine_url}>"
   alarm_actions       = [var.failed_sns_topic_arn]
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
   dimensions = {
-    StateMachineArn = aws_sfn_state_machine.this.name
+    StateMachineArn = aws_sfn_state_machine.this.arn
   }
   evaluation_periods = 1
   metric_name        = "ExecutionsFailed"
@@ -137,12 +141,12 @@ resource "aws_cloudwatch_metric_alarm" "failed" {
 resource "aws_cloudwatch_metric_alarm" "succeeded" {
   count               = var.succeeded_sns_topic_arn == null ? 0 : 1
   alarm_name          = "step_functions_${var.state_machine_name}_succeeded"
-  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Succeeded. "
+  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Succeeded. StateMachine: <${local.state_machine_url}>"
   alarm_actions       = [var.succeeded_sns_topic_arn]
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
   dimensions = {
-    StateMachineArn = aws_sfn_state_machine.this.name
+    StateMachineArn = aws_sfn_state_machine.this.arn
   }
   evaluation_periods = 1
   metric_name        = "ExecutionsSucceeded"
