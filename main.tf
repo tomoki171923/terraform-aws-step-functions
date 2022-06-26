@@ -105,7 +105,7 @@ resource "aws_cloudwatch_metric_alarm" "timeout" {
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
   dimensions = {
-    StateMachineArn = aws_sfn_state_machine.this.name
+    StateMachineArn = aws_sfn_state_machine.this.arn
   }
   evaluation_periods = 1
   metric_name        = "ExecutionsTimeOut"
@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "failed" {
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
   dimensions = {
-    StateMachineArn = aws_sfn_state_machine.this.name
+    StateMachineArn = aws_sfn_state_machine.this.arn
   }
   evaluation_periods = 1
   metric_name        = "ExecutionsFailed"
@@ -143,7 +143,7 @@ resource "aws_cloudwatch_metric_alarm" "succeeded" {
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
   dimensions = {
-    StateMachineArn = aws_sfn_state_machine.this.name
+    StateMachineArn = aws_sfn_state_machine.this.arn
   }
   evaluation_periods = 1
   metric_name        = "ExecutionsSucceeded"
