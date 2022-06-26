@@ -1,3 +1,3 @@
-output "ModuleName" {
-  value = module.ModuleName
+output "state_machine" {
+  value = module.state_machine
 }
