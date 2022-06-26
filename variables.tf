@@ -26,8 +26,8 @@ variable "state_machine_log_retention_in_days" {
   type        = number
   default     = 120
 }
-variable "timeout_sns_topic_arn" {
-  description = "SNS Topic ARN when state machine's state is timeout."
+variable "timedout_sns_topic_arn" {
+  description = "SNS Topic ARN when state machine's state is timedout."
   type        = string
   default     = null
 }
@@ -42,7 +42,7 @@ variable "succeeded_sns_topic_arn" {
   default     = null
 }
 variable "event_params" {
-  description = "event bridge parameters. name: event name, description: event description, input: input data to event, schedule_expression: schedule expression(cron format)."
+  description = "event bridge parameters. name: event name, description: event description, input: input data to event, schedule_expression: schedule expression."
   type = list(
     object({
       name                = string
@@ -52,4 +52,9 @@ variable "event_params" {
     })
   )
   default = null
+}
+variable "tags" {
+  description = "A map of tags to assign to resources."
+  type        = map(string)
+  default     = {}
 }

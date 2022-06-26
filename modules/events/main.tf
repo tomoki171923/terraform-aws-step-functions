@@ -10,8 +10,9 @@ resource "aws_cloudwatch_event_rule" "this" {
   description         = each.value.description
   schedule_expression = each.value.schedule_expression
   is_enabled          = true
-  tags                = { Terraform = true }
+  tags                = var.tags
 }
+
 resource "aws_cloudwatch_event_target" "this" {
   for_each = {
     for key in var.event_params : key.name => {
@@ -21,9 +22,10 @@ resource "aws_cloudwatch_event_target" "this" {
   }
   rule     = aws_cloudwatch_event_rule.this[each.value.name].name
   arn      = var.state_machine_arn
-  role_arn = var.state_machine_arn
-  input    = var.input
+  role_arn = module.iam_role_event.iam_role_arn
+  input    = each.value.input
 }
+
 module "iam_role_event" {
   # remote module
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
@@ -37,11 +39,12 @@ module "iam_role_event" {
   role_description  = "EventBridge execution role for ${var.state_machine_name} Step Functions."
   role_requires_mfa = false
 
-  custom_role_policy_arns = []
-  tags = {
-    Terraform = true
-  }
+  custom_role_policy_arns = [
+    aws_iam_policy.this.arn
+  ]
+  tags = var.tags
 }
+
 data "aws_iam_policy_document" "this" {
   statement {
     effect = "Allow"
@@ -53,11 +56,10 @@ data "aws_iam_policy_document" "this" {
     ]
   }
 }
+
 resource "aws_iam_policy" "this" {
   name        = "InvokeStepFunctions_${var.state_machine_name}"
-  description = "publish sns topic permission for ${var.state_machine_name} State Machine."
+  description = "Invoke ${var.state_machine_name} State Machine."
   policy      = data.aws_iam_policy_document.this.json
-  tags = {
-    Terraform = true
-  }
+  tags        = var.tags
 }
