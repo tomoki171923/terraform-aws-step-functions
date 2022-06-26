@@ -1,6 +1,6 @@
 provider "aws" {
-  region  = "ap-northeast-3"
-  profile = "private"
+  region  = "ap-northeast-1"
+  profile = "aws_profile_name"
 }
 
 /*
