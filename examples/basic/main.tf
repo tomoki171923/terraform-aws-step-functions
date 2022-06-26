@@ -62,8 +62,6 @@ module "lambda_alias" {
 locals {
   state_machine_name = "example"
 }
-data "aws_region" "this" {}
-data "aws_caller_identity" "this" {}
 data "aws_sns_topic" "this" {
   name = "states_alarms"
 }
@@ -126,7 +124,7 @@ EOF
     },
     "Wait": {
       "Type": "Wait",
-      "Comment": "Waitting",
+      "Comment": "Waiting",
       "Seconds": 5,
       "Next": "FunctionExample"
     },
