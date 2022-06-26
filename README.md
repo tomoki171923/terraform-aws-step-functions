@@ -136,8 +136,11 @@ EOF
 
 | Name               | Description                                                                                                                                                               |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| hogehoge           | hogehogehoge. See [official](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/) for details. |
-| fugafuga           | fugafugafuga. See [official](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/) for details. |
+| aws_sfn_state_machine           | Provides a Step Function State Machine resource. See [official](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sfn_state_machine) for details. |
+| aws_iam_policy           | Provides an IAM policy. See [official](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) for details. |
+| aws_iam_role           | Provides an IAM Role. See [official](https://registry.terraform.io/modules/terraform-aws-modules/iam/aws/latest/submodules/iam-assumable-role) for details. |
+| aws_cloudwatch_metric_alarm           | Provides a CloudWatch Metric Alarm resource. See [official](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) for details. |
+| events           | Provides an EventBridge Rule resource and others. See [the module](https://github.com/tomoki171923/terraform-aws-step-functions/tree/main/modules/events/) for details. |
 
 ## Authors
 
