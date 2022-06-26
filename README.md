@@ -20,7 +20,7 @@ data "aws_lambda_alias" "this" {
 
 module "state_machine" {
   source  = "tomoki171923/step-functions/aws"
-  version = "0.1.0"
+  version = "0.1.1"
   state_machine_name    = local.state_machine_name
   timedout_sns_topic_arn = data.aws_sns_topic.this.arn
   failed_sns_topic_arn  = data.aws_sns_topic.this.arn
