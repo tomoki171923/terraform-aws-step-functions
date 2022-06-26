@@ -97,10 +97,13 @@ module "iam_role_step_function" {
 /*
  CloudWatch Memetric Alarm
 */
+locals {
+  state_machine_url = "https://${data.aws_region.this.name}.console.aws.amazon.com/states/home?region=${data.aws_region.this.name}#/statemachines/view/arn:aws:states:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:stateMachine:${var.state_machine_name}"
+}
 resource "aws_cloudwatch_metric_alarm" "timedout" {
   count               = var.timeout_sns_topic_arn == null ? 0 : 1
   alarm_name          = "step_functions_${var.state_machine_name}_timedout"
-  alarm_description   = "StepFunctions ${var.state_machine_name} Execution TimedOut. "
+  alarm_description   = "StepFunctions ${var.state_machine_name} Execution TimedOut. StateMachine: <${local.state_machine_url}>"
   alarm_actions       = [var.timeout_sns_topic_arn]
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
@@ -119,7 +122,7 @@ resource "aws_cloudwatch_metric_alarm" "timedout" {
 resource "aws_cloudwatch_metric_alarm" "failed" {
   count               = var.failed_sns_topic_arn == null ? 0 : 1
   alarm_name          = "step_functions_${var.state_machine_name}_failed"
-  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Failed. "
+  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Failed. StateMachine: <${local.state_machine_url}>"
   alarm_actions       = [var.failed_sns_topic_arn]
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
@@ -138,7 +141,7 @@ resource "aws_cloudwatch_metric_alarm" "failed" {
 resource "aws_cloudwatch_metric_alarm" "succeeded" {
   count               = var.succeeded_sns_topic_arn == null ? 0 : 1
   alarm_name          = "step_functions_${var.state_machine_name}_succeeded"
-  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Succeeded. "
+  alarm_description   = "StepFunctions ${var.state_machine_name} Execution Succeeded. StateMachine: <${local.state_machine_url}>"
   alarm_actions       = [var.succeeded_sns_topic_arn]
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
