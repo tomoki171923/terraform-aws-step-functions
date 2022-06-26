@@ -97,10 +97,10 @@ module "iam_role_step_function" {
 /*
  CloudWatch Memetric Alarm
 */
-resource "aws_cloudwatch_metric_alarm" "timeout" {
+resource "aws_cloudwatch_metric_alarm" "timedout" {
   count               = var.timeout_sns_topic_arn == null ? 0 : 1
-  alarm_name          = "step_functions_${var.state_machine_name}_timeout"
-  alarm_description   = "StepFunctions ${var.state_machine_name} Execution TimeOut. "
+  alarm_name          = "step_functions_${var.state_machine_name}_timedout"
+  alarm_description   = "StepFunctions ${var.state_machine_name} Execution TimedOut. "
   alarm_actions       = [var.timeout_sns_topic_arn]
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
@@ -108,7 +108,7 @@ resource "aws_cloudwatch_metric_alarm" "timeout" {
     StateMachineArn = aws_sfn_state_machine.this.arn
   }
   evaluation_periods = 1
-  metric_name        = "ExecutionsTimeOut"
+  metric_name        = "ExecutionsTimedOut"
   namespace          = "AWS/States"
   period             = 60
   statistic          = "Average"

@@ -12,7 +12,7 @@ output "aws_iam_role" {
 }
 output "aws_cloudwatch_metric_alarm" {
   value = {
-    timeout   = aws_cloudwatch_metric_alarm.timeout
+    timeout   = aws_cloudwatch_metric_alarm.timedout
     failed    = aws_cloudwatch_metric_alarm.failed
     succeeded = aws_cloudwatch_metric_alarm.succeeded
   }
