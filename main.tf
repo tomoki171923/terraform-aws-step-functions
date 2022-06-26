@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "logs" {
       "logs:GetLogDelivery",
       "logs:UpdateLogDelivery",
       "logs:DeleteLogDelivery",
-      "logs:ListLogDeliverys",
+      "logs:ListLogDeliveries",
       "logs:PutResourcePolicy",
       "logs:DescribeResourcePolicies",
       "logs:DescribeLogGroups"
@@ -51,8 +51,8 @@ data "aws_iam_policy_document" "logs" {
   }
 }
 resource "aws_iam_policy" "logs" {
-  name        = "WriteLogs_${var.state_machine_name}"
-  description = "write cloudwatch logs permission for ${var.state_machine_name} State Machine."
+  name        = "CloudWatchLogsDeliveryFullAccessPolicy-${var.state_machine_name}"
+  description = "cloudwatch logs full access permission for ${var.state_machine_name} State Machine."
   policy      = data.aws_iam_policy_document.logs.json
   tags        = var.tags
 }
@@ -82,11 +82,12 @@ module "iam_role_step_function" {
     "states.amazonaws.com"
   ]
   create_role       = true
-  role_name         = "StepFunctionsRole_${var.state_machine_name}"
+  role_name         = "StepFunctions-${var.state_machine_name}-role"
   role_description  = "Step Functions (${var.state_machine_name}) IAM Role."
   role_requires_mfa = false
 
   custom_role_policy_arns = concat([
+    data.aws_iam_policy.AWSLambdaRole.arn,
     aws_iam_policy.sns.arn,
   aws_iam_policy.logs.arn], var.state_machine_additional_policies)
   tags = var.tags
