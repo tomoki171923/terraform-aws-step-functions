@@ -66,10 +66,10 @@ data "aws_sns_topic" "this" {
   name = "states_alarms"
 }
 module "state_machine" {
-  source                = "../../"
-  state_machine_name    = local.state_machine_name
-  timeout_sns_topic_arn = data.aws_sns_topic.this.arn
-  failed_sns_topic_arn  = data.aws_sns_topic.this.arn
+  source                 = "../../"
+  state_machine_name     = local.state_machine_name
+  timedout_sns_topic_arn = data.aws_sns_topic.this.arn
+  failed_sns_topic_arn   = data.aws_sns_topic.this.arn
   tags = {
     Terraform   = true
     Environment = "dev"

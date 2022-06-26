@@ -101,10 +101,10 @@ locals {
   state_machine_url = "https://${data.aws_region.this.name}.console.aws.amazon.com/states/home?region=${data.aws_region.this.name}#/statemachines/view/arn:aws:states:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:stateMachine:${var.state_machine_name}"
 }
 resource "aws_cloudwatch_metric_alarm" "timedout" {
-  count               = var.timeout_sns_topic_arn == null ? 0 : 1
+  count               = var.timedout_sns_topic_arn == null ? 0 : 1
   alarm_name          = "step_functions_${var.state_machine_name}_timedout"
   alarm_description   = "StepFunctions ${var.state_machine_name} Execution TimedOut. StateMachine: <${local.state_machine_url}>"
-  alarm_actions       = [var.timeout_sns_topic_arn]
+  alarm_actions       = [var.timedout_sns_topic_arn]
   comparison_operator = "GreaterThanThreshold"
   datapoints_to_alarm = 1
   dimensions = {
