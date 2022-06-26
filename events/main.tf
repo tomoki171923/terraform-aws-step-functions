@@ -39,8 +39,10 @@ module "iam_role_event" {
   role_description  = "EventBridge execution role for ${var.state_machine_name} Step Functions."
   role_requires_mfa = false
 
-  custom_role_policy_arns = []
-  tags                    = var.tags
+  custom_role_policy_arns = [
+    aws_iam_policy.this.arn
+  ]
+  tags = var.tags
 }
 
 data "aws_iam_policy_document" "this" {
