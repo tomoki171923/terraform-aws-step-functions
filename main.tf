@@ -6,7 +6,7 @@
 
 
 /*
- State Machine
+  State Machine
 */
 resource "aws_sfn_state_machine" "this" {
   name     = var.state_machine_name
@@ -30,7 +30,7 @@ resource "aws_cloudwatch_log_group" "this" {
 
 
 /*
- IAM Role For State Machine
+  IAM Role For State Machine
 */
 data "aws_iam_policy_document" "logs" {
   statement {
@@ -95,7 +95,7 @@ module "iam_role_step_function" {
 
 
 /*
- CloudWatch Memetric Alarm
+  CloudWatch Memetric Alarm
 */
 locals {
   state_machine_url = "https://${data.aws_region.this.name}.console.aws.amazon.com/states/home?region=${data.aws_region.this.name}#/statemachines/view/arn:aws:states:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:stateMachine:${var.state_machine_name}"
@@ -160,7 +160,7 @@ resource "aws_cloudwatch_metric_alarm" "succeeded" {
 
 
 /*
- Event Bridge
+  Event Bridge
 */
 module "events" {
   count              = var.event_params == null ? 0 : 1
