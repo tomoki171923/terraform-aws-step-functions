@@ -35,8 +35,8 @@ module "iam_role_event" {
     "events.amazonaws.com"
   ]
   create_role       = true
-  role_name         = "EventBridgeInvokeStepFunctions_${var.state_machine_name}"
-  role_description  = "EventBridge execution role for ${var.state_machine_name} Step Functions."
+  role_name         = "EventBridgeInvokeStepFunctions_${var.state_machine_name}_${var.aws_region}"
+  role_description  = "EventBridge execution role for ${var.state_machine_name} Step Functions in ${var.aws_region}."
   role_requires_mfa = false
 
   custom_role_policy_arns = [
@@ -58,8 +58,8 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_policy" "this" {
-  name        = "InvokeStepFunctions_${var.state_machine_name}"
-  description = "Invoke ${var.state_machine_name} State Machine."
+  name        = "InvokeStepFunctions_${var.state_machine_name}_${var.aws_region}"
+  description = "Invoke ${var.state_machine_name} State Machine in ${var.aws_region}."
   policy      = data.aws_iam_policy_document.this.json
   tags        = var.tags
 }
