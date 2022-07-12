@@ -35,7 +35,7 @@ module "iam_role_event" {
     "events.amazonaws.com"
   ]
   create_role       = true
-  role_name         = "EventBridgeInvokeStepFunctions_${var.state_machine_name}_${var.aws_region}"
+  role_name         = "EventBridgeInvoke_${var.state_machine_name}_${var.aws_region}"
   role_description  = "EventBridge execution role for ${var.state_machine_name} Step Functions in ${var.aws_region}."
   role_requires_mfa = false
 
