@@ -51,8 +51,8 @@ data "aws_iam_policy_document" "logs" {
   }
 }
 resource "aws_iam_policy" "logs" {
-  name        = "CloudWatchLogsDeliveryFullAccessPolicy-${var.state_machine_name}"
-  description = "cloudwatch logs full access permission for ${var.state_machine_name} State Machine."
+  name        = "CloudWatchLogsDeliveryFullAccessPolicy_${var.state_machine_name}_${data.aws_region.this.name}"
+  description = "cloudwatch logs full access permission for ${var.state_machine_name} State Machine in ${data.aws_region.this.name}."
   policy      = data.aws_iam_policy_document.logs.json
   tags        = var.tags
 }
@@ -63,13 +63,13 @@ data "aws_iam_policy_document" "sns" {
       "sns:Publish"
     ]
     resources = [
-      "arn:aws:sns:*:${data.aws_caller_identity.this.account_id}:*"
+      "arn:aws:sns:${data.aws_region.this.name}:${data.aws_caller_identity.this.account_id}:*"
     ]
   }
 }
 resource "aws_iam_policy" "sns" {
-  name        = "PublishSNS_${var.state_machine_name}"
-  description = "publish sns topic permission for ${var.state_machine_name} State Machine."
+  name        = "PublishSNS_${var.state_machine_name}_${data.aws_region.this.name}"
+  description = "publish sns topic permission for ${var.state_machine_name} State Machine in ${data.aws_region.this.name}."
   policy      = data.aws_iam_policy_document.sns.json
   tags        = var.tags
 }
@@ -82,8 +82,8 @@ module "iam_role_step_function" {
     "states.amazonaws.com"
   ]
   create_role       = true
-  role_name         = "StepFunctions-${var.state_machine_name}-role"
-  role_description  = "Step Functions (${var.state_machine_name}) IAM Role."
+  role_name         = "StepFunctions_${var.state_machine_name}_${data.aws_region.this.name}"
+  role_description  = "Step Functions (${var.state_machine_name}) in ${data.aws_region.this.name} IAM Role."
   role_requires_mfa = false
 
   custom_role_policy_arns = concat([
